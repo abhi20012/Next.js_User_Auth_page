@@ -2,7 +2,8 @@
 import { useState } from "react";
 import Input from "@/app/components/Input";
 import Link from "next/link";
-
+import axios from 'axios';
+import { useRouter } from "next/navigation";
 
 
 const defaultValue = {
@@ -12,12 +13,14 @@ const defaultValue = {
 
 const Login = () => {
 	const [data, setData] = useState(defaultValue);
+  const router = useRouter();
 
 	const onValueChange = (e) => {
 		setData({...data, [e.target.name]: e.target.value});
 	}
 
-	const onLogin = (e) => {
+
+	const onLogin = async (e) => {
 		e.preventDefault();
 
 		if( !data.username || !data.password){
@@ -25,7 +28,19 @@ const Login = () => {
 			return;
 		}
 
-		//API call
+    try {
+      const response = await axios.post('api/users/login', data);
+      setData(defaultValue);
+
+      if(response.status === 200){
+        router.push('/profile');
+      }
+
+    } catch (error) {
+      console.log("Error while log in user", error);
+      return;
+    }
+    
 		
 	}
   return (
